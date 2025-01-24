@@ -1,93 +1,67 @@
-# Assignment_1
+**PCSE 595 – Spring 2022
+Assignment 1**
 
 
+The goal of this assignment is to gain an understanding of some machine learning fundamentals such as loading, handling, and visualizing data, get some practice with common Python packages, ensure you are familiar with two basic classifiers, and understand proper experimental set up.
 
-## Getting started
+You will code two different classifiers, ensure their correctness on an easy dataset, and apply them to a more complex dataset. You will tune their hyperparameters and compare the two using proper experimental set up. 
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+Specific requirements:
+1.	Implement a K Nearest Neighbors Classifier
+	a.	Implement Euclidean and cosine distance metrics
+	b. 	Design a simple test case and verify the correctness of your algorithm
+	b.	The KNN classifier has “k” and the distance metric as hyperparameters
+	d.	Follow instructions in nearest_neighbor.py
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+2.	Implement a Decision Tree Classifier
+	a.	Featurize the data for use in a decision tree by converting continuous numeric data to binary data by finding borders between classes 
+	b.	Use random and information gain as splitting criteria
+	c.	Design a simple test case and verify the correctness of your algorithm
+	d.	Follow instructions in decision_tree.py
+	e.	Manually check your code and follow the instructions in test_decision_tree.py
 
-## Add your files
+3.	Compare the performance of the two algorithms on the Wisconsin Breast Cancer Dataset using proper experimental set up
+	a.	Use a cross validation to tune the hyperparameters
+	b.	Use a test dataset to evaluate performance
+	c.	Use accuracy as your evaluation metric
+	d.	Implement TODOs in dataset.py
+	e.	Follow instructions in run_experiment.py
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+To reduce the workload, I provided some base code. You should fill in relevant sections marked with TODO statements. All your code must be from scratch. You may not use pre-existing libraries to do the work for you. The ONLY libraries you may use are already imported into the project code. These libraries include: os, csv, sys, numpy, matplotlib, random.
 
-```
-cd existing_repo
-git remote add origin https://student-gitlab.pcs.cnu.edu/pcse555_s25/assignment_1.git
-git branch -M main
-git push -uf origin main
-```
+All work must be your own. You may not show anyone your code. You may not share your code with anyone. You may discuss general concepts with your classmates. You may not use pre-existing implementations on the internet. Use the class slides as your first reference, use the provided textbooks as your second reference, and Dr. Henry as your third reference. 
 
-## Integrate with your tools
+Focus on understanding the material. Searching the internet will likely confuse you. The best way to implement machine learning is to choose a single implementation strategy (i.e. the one in the slides) and implement it based on the math. There are many differences in derivations and implementation details of machine learning algorithms, and a heavy reliance on pre-existing packages (which you aren’t allowed to use). I have given you everything you need to implement the algorithms – use it.
 
-- [ ] [Set up project integrations](https://student-gitlab.pcs.cnu.edu/pcse555_s25/assignment_1/-/settings/integrations)
+**Dataset Details**
 
-## Collaborate with your team
+Wisconsin Breast Cancer Dataset:
+This dataset is provided to you in data/breast-cancer-wisconsin.csv. 
+The dataset consists of 699 samples with 9 features each. The features all have values between 1 and 10. The features are:
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+0. Clump Thickness
+1. Uniformity of Cell Size
+2. Uniformity of Cell Shape
+3. Marginal Adhesion
+4. Single Epithelial Cell Size
+5. Bare Nuclei
+6. Bland Chromatin
+7. Normal Nucleoli
+8. Mitoses
 
-## Test and Deploy
+Each row in data/breast-cancer-wisconsin.csv corresponds to a single sample, each column a feature, and the label is provided in the last column. A label of 0 indicates benign (non-cancerous), and a label of 1 indicates malignant (cancerous). 
 
-Use the built-in continuous integration in GitLab.
+**Deliverables**
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+Submit all deliverables via gitlab. These should include:
 
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+1)     Photos of complete worksheets (covariance calculation, Distance Measures and Nearest Neighbors Classifier, and Nearest Centroid Classifier using Mahalanobis Distance)
+2)	All of your code
+3)	test_decision_tree.py is completed, and the photo upload of your manual calculations
+4)	The figure output from nearest_neighbors.py with your name in the title
+	a.	Use Euclidean distance and k = 5 to generate the figure
+5)	The figure output from decision_tree.py with your name in the title
+	a.	Use a max_depth of 10 to generate the figure
+6)	A completed assignment1_report.docx
+	a.	Fill in the blanks for the template provided and answer the questions at the bottom
+	b.	Please leave all of your inserted text highlighted (it makes it easier for me to grade)
