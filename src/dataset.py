@@ -1,3 +1,5 @@
+from math import remainder
+
 import numpy as np
 import csv
 
@@ -164,7 +166,20 @@ class Dataset:
                              of the data into the test set. Not
         :return: a tuple containing two Dataset Objects (test_dataset, training_dataset)
         """
-        # TODO - implement me
+        numIndex = int(len(self.labels)*(test_percent/100))
+
+        numberTestSamples,numberTestLabels = self.labels[0:numIndex],self.labels[0:numIndex]
+        numberTrainingSamples,numberTrainingLabels = self.labels[numIndex:],self.labels[numIndex:]
+
+        testDataSet = Dataset(numberTestSamples,numberTestLabels)
+        trainingDataSet = Dataset(numberTrainingSamples,numberTrainingLabels)
+
+        return  (testDataSet,trainingDataSet)
+
+
+
+
+
 
     def split_into_folds(self, num_folds):
         """
@@ -182,5 +197,17 @@ class Dataset:
         :return: a list of Dataset objects containing a Dataset per split
         """
 
-        #TODO - implement me
-        # Hint: How will you deal with data that doesn't divide evenly
+        num, remainder = divmod(len(self.samples), num_folds)
+
+        startIndex = 0
+
+        result = []
+
+        for i in range(num_folds):
+            end = startIndex + num + (1 if i < remainder else 0)
+
+            result.append(Dataset(self.samples[startIndex:end],self.labels[startIndex:end]))
+
+            startIndex = end
+
+        return result

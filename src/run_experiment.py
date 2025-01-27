@@ -1,5 +1,6 @@
-from src.decision_tree import *
-import src.nearest_neighbor as knn
+from assignment_1.src.dataset import Dataset
+from decision_tree import *
+import nearest_neighbor as knn
 import numpy as np
 
 
@@ -35,7 +36,7 @@ if __name__ == '__main__':
     num_folds = 5
 
     # load breast cancer data from file
-    raw_data = Dataset.load_from_file(os.path.join("data", "breast-cancer-wisconsin.csv"))
+    raw_data = Dataset.load_from_file(os.path.join("../data", "breast-cancer-wisconsin.csv"))
 
     # shuffle data before split
     raw_data.shuffle()
@@ -45,6 +46,7 @@ if __name__ == '__main__':
 
     # create each bucket
     buckets = training_data.split_into_folds(num_folds)
+    print(buckets)
 
     # TODO - implement methods in marked by TODOs in dataset.py
     #  These will be used for cross-validation

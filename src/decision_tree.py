@@ -1,8 +1,10 @@
 import numpy as np
-from src.dataset import *
+from dataset import *
 import matplotlib.pyplot as plt
 import os
 import random
+
+from assignment_1.src.dataset import generate_data, combine_data
 
 
 def find_features_for_continuous_data(data):

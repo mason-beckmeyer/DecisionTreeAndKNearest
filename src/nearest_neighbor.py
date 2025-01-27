@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import sys
-from src.dataset import *
+from dataset import *
 
 
 def nearest_neighbor(dataset, new_sample, distance_measure):
@@ -16,7 +16,17 @@ def nearest_neighbor(dataset, new_sample, distance_measure):
     """
     # TODO - implement me first - make sure your code works with a single
     #  nearest neighbor before adapting it to k-nearest neighbors
-    pass
+
+    dictLengths = {}
+
+    for label, sample in zip(dataset.labels, dataset.samples):
+        dictLengths[distance_measure(sample, new_sample)] = label
+
+    listClosest = list(dictLengths.keys())
+    listClosest.sort()
+
+
+    return listClosest[0]
 
 
 def classify_samples(labeled_dataset, unlabeled_samples, k, distance_measure):
@@ -49,7 +59,37 @@ def classify_sample(labeled_dataset, new_sample, k, distance_measure):
     # TODO - implement me
     #  Hint: this can be trickier than it seems, find the distance to all points
     #        then, find the k-closest points, then take a vote using those points
-    pass
+
+    #Iterate over data set and rank by distance create a dict of distance and then the data lable
+    # Sort keys by distance
+    # Varaible # 0 and # 1
+    # Iterate over keys k times change count variables
+    #Find max count 1 or 0
+    #Return label
+
+    dictLengths = {}
+
+    for label,sample in zip(labeled_dataset.labels,labeled_dataset.samples):
+        dictLengths[distance_measure(sample,new_sample)] = label
+
+
+    listClosest = list(dictLengths.keys())
+    listClosest.sort()
+    countZero = 0
+    countOne = 1
+
+    for item in range(0,k,1):
+        label = dictLengths.get(listClosest[item])
+        if label == 0:
+            countZero+=1
+        else:
+            countOne+=1
+
+    if countZero > countOne:
+        return 0
+    else:
+        return 1
+
 
 
 def euclidean(a, b):
@@ -60,7 +100,8 @@ def euclidean(a, b):
     :return: the euclidean distance between the two samples
     """
     # TODO - implement me
-    pass
+
+    return np.linalg.norm(a-b)
 
 
 def cosine(a, b):
@@ -71,7 +112,7 @@ def cosine(a, b):
     :return: the cosine distance between the two samples
     """
     # TODO - implement me
-    pass
+    return np.dot(a,b)/(np.linalg.norm(a)*np.linalg.norm(b))
 
 
 if __name__ == '__main__':
@@ -80,7 +121,7 @@ if __name__ == '__main__':
     k = 5
 
     # the figure title and output
-    fig_output = os.path.join("output", "KNN_K5_euclidean")
+    fig_output = os.path.join("../output", "KNN_K5_euclidean")
     fig_title = 'KNN (K=5) Euclidean Distance Classification'
 
     # generate test and training data
@@ -100,8 +141,8 @@ if __name__ == '__main__':
     fig = plt.figure()
     plt.plot(data1.samples[:, 0], data1.samples[:, 1], 'b.', label='given class a')
     plt.plot(data2.samples[:, 0], data2.samples[:, 1], 'r.', label='given class b')
-    plt.plot(predicted1_samples[:, 0], predicted1_samples[:, 1], 'g*', label='predicted class a')
-    plt.plot(predicted2_samples[:, 0], predicted2_samples[:, 1], '*', color='orange', label='predicated class b')
+    plt.plot(predicted1_samples[:, 0], predicted1_samples[:, 1], 'b*',alpha=0.5 ,label='predicted class a')
+    plt.plot(predicted2_samples[:, 0], predicted2_samples[:, 1], 'r*', alpha=0.5, label='predicated class b')
     plt.xlabel('X-axis')
     plt.ylabel('Y-Axis')
     plt.title(fig_title)
