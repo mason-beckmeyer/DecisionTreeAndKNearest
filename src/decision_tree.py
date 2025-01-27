@@ -33,6 +33,29 @@ def find_features_for_continuous_data(data):
     # Minor Implementation note: When creating the dictionary of points there may be collisions
     # where is already in the dictionary (possibly with a different label). It is OK to ignore
     # these collisions (just overwrite the previous value).
+    dimensionOneDict = {}
+    dimensionTwoDict = {}
+
+    dimensionOneList = []
+    dimensionTwoList = []
+    result = []
+
+    for sample,label in zip(data.samples,data.labels):
+        dimensionOneDict[sample[0]] = label
+        dimensionTwoDict[sample[1]] = label
+
+    dimensionOneKeys = list(dimensionOneDict.keys())
+    dimensionTwoKeys = list(dimensionTwoDict.keys())
+    dimensionOneKeys.sort()
+    dimensionTwoKeys.sort()
+
+    #Iterate through keys
+    #Start at second element and check previous
+    #If label is different calculate midpoint
+    #Add to list
+
+
+
     pass
 
 
