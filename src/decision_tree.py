@@ -53,10 +53,27 @@ def find_features_for_continuous_data(data):
     #Start at second element and check previous
     #If label is different calculate midpoint
     #Add to list
+    for index in range(1,len(dimensionOneKeys)):
 
+        prev = index -1
+        dimOne = dimensionOneKeys[index]
+        dimOnePrev = dimensionOneKeys[prev]
 
+        dimTwo = dimensionTwoKeys[index]
+        dimTwoPrev = dimensionTwoKeys[prev]
 
-    pass
+        if (dimensionOneDict[dimOne] != dimensionOneDict[dimOnePrev]):
+            midpoint = (dimOne+dimOnePrev)/2
+            dimensionOneList.append(midpoint)
+
+        if (dimensionTwoDict[dimTwo] != dimensionTwoDict[dimTwoPrev]):
+            midpoint = (dimTwo+dimTwoPrev)/2
+            dimensionTwoList.append(midpoint)
+
+    result.append(dimensionOneList)
+    result.append(dimensionTwoList)
+
+    return result
 
 
 def featurize_continuous_data(data, features):
@@ -71,8 +88,17 @@ def featurize_continuous_data(data, features):
     # Hint: Recall, you create a set of features which indicates the feature number
     #       and value for a "is sample[feature_number] < value" type test. This method
     #       converts numeric data to binary (True/False) data using those features
-    pass
 
+    samples = np.array(data.samples)
+
+    binFeatures = []
+
+    for dimension,threshold in enumerate(features):
+        for threshold in threshold:
+            binFeatures.append(samples[:,dimension] < threshold)
+
+    numpyArray = np.array(binFeatures).T
+    return numpyArray
 
 def entropy(dataset):
     """
@@ -222,6 +248,11 @@ class DecisionTree:
         #      all classes are the same
         #      splitting by a feature adds no information
         #      depth > max depth
+
+        functionData = self.features
+        otherStuff = self.root.data
+
+
         pass
 
 
