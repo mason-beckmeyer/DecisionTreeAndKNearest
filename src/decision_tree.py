@@ -11,7 +11,7 @@ def find_features_for_continuous_data(data):
     """
     Finds features for continuous data - features are halfway points
     between class boundaries
-
+giytiuytuyttut
     :param data: the data to create features for
     :return: a list of lists describing the split values for each dimension
              the first dimension contains a list for each dimension of the original data
@@ -90,15 +90,20 @@ def featurize_continuous_data(data, features):
     #       converts numeric data to binary (True/False) data using those features
 
     samples = np.array(data.samples)
+    num_samples = samples.shape[0]
+    num_features = sum(len(thresh) for thresh in features)
 
-    binFeatures = []
 
-    for dimension,threshold in enumerate(features):
-        for threshold in threshold:
-            binFeatures.append(samples[:,dimension] < threshold)
+    binFeatures = np.zeros((num_samples, num_features), dtype=bool)
 
-    numpyArray = np.array(binFeatures).T
-    return numpyArray
+    feature_index = 0
+
+    for dimension, thresholds in enumerate(features):
+        for threshold in thresholds:
+            binFeatures[:, feature_index] = samples[:, dimension] < threshold
+            feature_index += 1  # Move to next column
+
+    return Dataset(binFeatures.astype(int), data.labels)
 
 def entropy(dataset):
     """
@@ -108,7 +113,18 @@ def entropy(dataset):
     :return: the entropy of the dataset
     """
     # TODO - implement me
-    pass
+
+    labels = dataset.labels
+    totalSamples = len(labels)
+
+    if totalSamples == 0:
+        return 0
+
+    unique_labels, label_counts = np.unique(labels, return_counts=True)
+
+    entropyV = -np.sum((label_counts / totalSamples) * np.log2(label_counts / totalSamples))
+
+    return entropyV
 
 
 class Node:
@@ -149,7 +165,16 @@ class Node:
         #  Hint: This is a helper function for find_feature_which_best_spits.
         #  It splits the dataset at this node into samples which are
         #  true vs. false for the feature at feature_index
-        pass
+
+        samples = self.data.samples
+        labels = self.data.labels
+
+        # Create boolean masks for filtering
+        mask_true = samples[:, feature_index] == 1
+        mask_false = samples[:, feature_index] == 0
+
+
+        return Dataset(samples[mask_true], labels[mask_true]), Dataset(samples[mask_false], labels[mask_false])
 
     def find_feature_which_best_splits(self):
         """
@@ -160,7 +185,36 @@ class Node:
                  returns -1 if no feature increases information
         """
         # TODO - implement me
-        pass
+
+        best = -1
+        bestGain = 0
+        if not isinstance(self.data, Dataset):
+            raise TypeError("Expected self.data to be a Dataset object, but got a NumPy array.")
+
+        pEntropy = entropy(self.data)
+        numFeatures = self.data.num_features
+
+        for idx in range(numFeatures):
+            dataTrue, dataFalse = self.split_by(idx)
+
+            # Skip empty splits
+            if dataTrue.num_samples == 0 or dataFalse.num_samples == 0:
+                continue
+
+            leftEntropy = entropy(dataTrue)
+            rightEntropy = entropy(dataFalse)
+
+            total = self.data.num_samples
+            weighted = ((dataTrue.num_samples / total) * leftEntropy +
+                        (dataFalse.num_samples / total) * rightEntropy)
+
+            infoGain = pEntropy - weighted
+
+            if infoGain > bestGain:
+                bestGain = infoGain
+                best = idx
+
+        return best
 
 
 class DecisionTree:
@@ -182,7 +236,9 @@ class DecisionTree:
                  prediction of each sample in data
         """
         # TODO - implement me
-        pass
+        predictions = [self._predict_sample(sample, self.root) for sample in data.samples]
+
+        return np.array(predictions)
 
     def _predict_sample(self, sample, current_node):
         """
@@ -196,7 +252,14 @@ class DecisionTree:
         #  Hint: to perform prediction, traverse the tree with the sample.
         #  The final prediction should be the majority class of leaf node
         #  reached by traversing the tree with the sample.
-        pass
+        if current_node.true_child is None and current_node.false_child is None:
+            return current_node.predicted_class
+
+
+        if sample[current_node.feature_index]:
+            return self._predict_sample(sample, current_node.true_child)
+        else:
+            return self._predict_sample(sample, current_node.false_child)
 
     def __str__(self):
         """
@@ -249,17 +312,48 @@ class DecisionTree:
         #      splitting by a feature adds no information
         #      depth > max depth
 
-        functionData = self.features
-        otherStuff = self.root.data
+
+        labels = current_node.data.labels
+
+        if len(set(labels)) == 1:
+            current_node.is_leaf = True
+            current_node.predicted_class = labels[0]
+            return
 
 
-        pass
+        if depth >= self.max_depth:
+            current_node.is_leaf = True
+            current_node.predicted_class = max(set(labels), key=labels.count)
+            return
+
+
+        bestFeature = current_node.find_feature_which_best_splits()
+
+
+        if bestFeature == -1:
+            current_node.is_leaf = True
+            current_node.predicted_class = max(set(labels), key=labels.count)
+            return
+
+
+        dataTrue, dataFalse = current_node.split_by(bestFeature)
+
+
+
+        current_node.feature_index = bestFeature
+        current_node.true_child = Node(Dataset(dataTrue.samples, dataTrue.labels))
+        current_node.false_child = Node(Dataset(dataFalse.samples, dataFalse.labels))
+
+        self._divide(current_node.true_child, depth + 1)
+        self._divide(current_node.false_child, depth + 1)
+
+
 
 
 if __name__ == '__main__':
     # hard-coded parameters
     max_depth = 10
-    fig_output = os.path.join("output", "Decision_Tree_max_depth_10")
+    fig_output = os.path.join("../output", "Decision_Tree_max_depth_10")
     fig_title = 'Decision Tree (Max_Depth=10) Classification [TODO - insert your name here]'
 
     # generate test and training data

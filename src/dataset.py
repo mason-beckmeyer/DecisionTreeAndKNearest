@@ -166,15 +166,17 @@ class Dataset:
                              of the data into the test set. Not
         :return: a tuple containing two Dataset Objects (test_dataset, training_dataset)
         """
-        numIndex = int(len(self.labels)*(test_percent/100))
+        numIndex = int(self.num_samples * (test_percent / 100))
 
-        numberTestSamples,numberTestLabels = self.labels[0:numIndex],self.labels[0:numIndex]
-        numberTrainingSamples,numberTrainingLabels = self.labels[numIndex:],self.labels[numIndex:]
 
-        testDataSet = Dataset(numberTestSamples,numberTestLabels)
-        trainingDataSet = Dataset(numberTrainingSamples,numberTrainingLabels)
+        testSamples, testLabels = self.samples[:numIndex], self.labels[:numIndex]
+        trainSamples, trainLabels = self.samples[numIndex:], self.labels[numIndex:]
 
-        return  (testDataSet,trainingDataSet)
+
+        testDataset = Dataset(testSamples, testLabels)
+        trainDataset = Dataset(trainSamples, trainLabels)
+
+        return testDataset, trainDataset
 
 
 
@@ -197,17 +199,25 @@ class Dataset:
         :return: a list of Dataset objects containing a Dataset per split
         """
 
-        num, remainder = divmod(len(self.samples), num_folds)
+        num_samples_per_fold, remainder = divmod(self.num_samples, num_folds)
 
+        indices = np.arange(self.num_samples)
+        np.random.shuffle(indices)
+
+        folds = []
         startIndex = 0
 
-        result = []
-
         for i in range(num_folds):
-            end = startIndex + num + (1 if i < remainder else 0)
 
-            result.append(Dataset(self.samples[startIndex:end],self.labels[startIndex:end]))
+            endIndex = startIndex + num_samples_per_fold + (1 if i < remainder else 0)
+            fold_indices = indices[startIndex:endIndex]
 
-            startIndex = end
+            fold_samples = self.samples[fold_indices]
+            fold_labels = self.labels[fold_indices]
 
-        return result
+
+            folds.append(Dataset(fold_samples, fold_labels))
+
+            startIndex = endIndex
+
+        return folds
