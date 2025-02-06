@@ -33,47 +33,29 @@ giytiuytuyttut
     # Minor Implementation note: When creating the dictionary of points there may be collisions
     # where is already in the dictionary (possibly with a different label). It is OK to ignore
     # these collisions (just overwrite the previous value).
-    dimensionOneDict = {}
-    dimensionTwoDict = {}
+    num_features = data.num_features
+    features_per_dimension = []
 
-    dimensionOneList = []
-    dimensionTwoList = []
-    result = []
+    for dim in range(num_features):
+        value_label_map = {}
+        for sample, label in zip(data.samples, data.labels):
+            value_label_map[sample[dim]] = label
 
-    for sample,label in zip(data.samples,data.labels):
-        dimensionOneDict[sample[0]] = label
-        dimensionTwoDict[sample[1]] = label
+        sorted_items = sorted(value_label_map.items(), key=lambda x: x[0])
+        thresholds = []
 
-    dimensionOneKeys = list(dimensionOneDict.keys())
-    dimensionTwoKeys = list(dimensionTwoDict.keys())
-    dimensionOneKeys.sort()
-    dimensionTwoKeys.sort()
+        # Compare adjacent items in sorted order
+        for i in range(1, len(sorted_items)):
+            prev_val, prev_lab = sorted_items[i - 1]
+            curr_val, curr_lab = sorted_items[i]
+            if prev_lab != curr_lab:
+                midpoint = (prev_val + curr_val) / 2
+                thresholds.append(midpoint)
+                print("this is the midpoint",midpoint)
 
-    #Iterate through keys
-    #Start at second element and check previous
-    #If label is different calculate midpoint
-    #Add to list
-    for index in range(1,len(dimensionOneKeys)):
+        features_per_dimension.append(thresholds)
 
-        prev = index -1
-        dimOne = dimensionOneKeys[index]
-        dimOnePrev = dimensionOneKeys[prev]
-
-        dimTwo = dimensionTwoKeys[index]
-        dimTwoPrev = dimensionTwoKeys[prev]
-
-        if (dimensionOneDict[dimOne] != dimensionOneDict[dimOnePrev]):
-            midpoint = (dimOne+dimOnePrev)/2
-            dimensionOneList.append(midpoint)
-
-        if (dimensionTwoDict[dimTwo] != dimensionTwoDict[dimTwoPrev]):
-            midpoint = (dimTwo+dimTwoPrev)/2
-            dimensionTwoList.append(midpoint)
-
-    result.append(dimensionOneList)
-    result.append(dimensionTwoList)
-
-    return result
+    return features_per_dimension
 
 
 def featurize_continuous_data(data, features):
@@ -89,21 +71,19 @@ def featurize_continuous_data(data, features):
     #       and value for a "is sample[feature_number] < value" type test. This method
     #       converts numeric data to binary (True/False) data using those features
 
-    samples = np.array(data.samples)
-    num_samples = samples.shape[0]
-    num_features = sum(len(thresh) for thresh in features)
+    samples = data.samples
+    num_samples = data.num_samples
+    total_binary_features = sum(len(thresh_list) for thresh_list in features)
 
-
-    binFeatures = np.zeros((num_samples, num_features), dtype=bool)
+    bin_features = np.zeros((num_samples, total_binary_features), dtype=bool)
 
     feature_index = 0
+    for dim, threshold_list in enumerate(features):
+        for threshold in threshold_list:
+            bin_features[:, feature_index] = samples[:, dim] < threshold
+            feature_index += 1
 
-    for dimension, thresholds in enumerate(features):
-        for threshold in thresholds:
-            binFeatures[:, feature_index] = samples[:, dimension] < threshold
-            feature_index += 1  # Move to next column
-
-    return Dataset(binFeatures.astype(int), data.labels)
+    return Dataset(bin_features.astype(int), data.labels)
 
 def entropy(dataset):
     """
@@ -188,8 +168,7 @@ class Node:
 
         best = -1
         bestGain = 0
-        if not isinstance(self.data, Dataset):
-            raise TypeError("Expected self.data to be a Dataset object, but got a NumPy array.")
+
 
         pEntropy = entropy(self.data)
         numFeatures = self.data.num_features
@@ -213,7 +192,7 @@ class Node:
             if infoGain > bestGain:
                 bestGain = infoGain
                 best = idx
-
+        print("This is best info gain ",best)
         return best
 
 
@@ -237,7 +216,6 @@ class DecisionTree:
         """
         # TODO - implement me
         predictions = [self._predict_sample(sample, self.root) for sample in data.samples]
-
         return np.array(predictions)
 
     def _predict_sample(self, sample, current_node):
@@ -323,7 +301,10 @@ class DecisionTree:
 
         if depth >= self.max_depth:
             current_node.is_leaf = True
-            current_node.predicted_class = max(set(labels), key=labels.count)
+            unique_labels, label_counts = np.unique(labels, return_counts=True)
+            majority_label = unique_labels[np.argmax(label_counts)]
+            current_node.predicted_class = majority_label
+
             return
 
 
@@ -332,7 +313,9 @@ class DecisionTree:
 
         if bestFeature == -1:
             current_node.is_leaf = True
-            current_node.predicted_class = max(set(labels), key=labels.count)
+            unique_labels, label_counts = np.unique(labels, return_counts=True)
+            majority_label = unique_labels[np.argmax(label_counts)]
+            current_node.predicted_class = majority_label
             return
 
 

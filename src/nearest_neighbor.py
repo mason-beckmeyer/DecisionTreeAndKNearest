@@ -17,16 +17,15 @@ def nearest_neighbor(dataset, new_sample, distance_measure):
     # TODO - implement me first - make sure your code works with a single
     #  nearest neighbor before adapting it to k-nearest neighbors
 
-    dictLengths = {}
-
+    distanceLabelPairs = []
     for label, sample in zip(dataset.labels, dataset.samples):
-        dictLengths[distance_measure(sample, new_sample)] = label
-
-    listClosest = list(dictLengths.keys())
-    listClosest.sort()
+        dist = distance_measure(sample, new_sample)
+        distanceLabelPairs.append((dist, label))
 
 
-    return listClosest[0]
+    distanceLabelPairs.sort(key=lambda x: x[0])
+
+    return distanceLabelPairs[0][1]
 
 
 def classify_samples(labeled_dataset, unlabeled_samples, k, distance_measure):
@@ -67,28 +66,23 @@ def classify_sample(labeled_dataset, new_sample, k, distance_measure):
     #Find max count 1 or 0
     #Return label
 
-    dictLengths = {}
+    distanceLabelPairs = []
+    for label, sample in zip(labeled_dataset.labels, labeled_dataset.samples):
+        dist = distance_measure(sample, new_sample)
+        distanceLabelPairs.append((dist, label))
 
-    for label,sample in zip(labeled_dataset.labels,labeled_dataset.samples):
-        dictLengths[distance_measure(sample,new_sample)] = label
+
+    distanceLabelPairs.sort(key=lambda x: x[0])
 
 
-    listClosest = list(dictLengths.keys())
-    listClosest.sort()
-    countZero = 0
-    countOne = 1
+    kLabels = [label for (_, label) in distanceLabelPairs[:k]]
 
-    for item in range(0,k,1):
-        label = dictLengths.get(listClosest[item])
-        if label == 0:
-            countZero+=1
-        else:
-            countOne+=1
 
-    if countZero > countOne:
-        return 0
-    else:
-        return 1
+    kLabelsArray = np.array(kLabels, dtype=int)
+    labelCounts = np.bincount(kLabelsArray)
+    predictedLabel = np.argmax(labelCounts)
+
+    return predictedLabel
 
 
 
@@ -112,7 +106,7 @@ def cosine(a, b):
     :return: the cosine distance between the two samples
     """
     # TODO - implement me
-    return np.dot(a,b)/(np.linalg.norm(a)*np.linalg.norm(b))
+    return 1 - np.dot(a,b)/(np.linalg.norm(a)*np.linalg.norm(b))
 
 
 if __name__ == '__main__':
