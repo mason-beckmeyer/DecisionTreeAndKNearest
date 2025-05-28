@@ -41,6 +41,7 @@ def classify_samples(labeled_dataset, unlabeled_samples, k, distance_measure):
     """
     labels = []
     for i in range(unlabeled_samples.shape[0]):
+        # Loops through the number of unlabeled samples and appends labels of recently classified samples to labels list
         labels.append(classify_sample(labeled_dataset, unlabeled_samples[i, :], k, distance_measure))
     return np.array(labels)
 
@@ -66,20 +67,26 @@ def classify_sample(labeled_dataset, new_sample, k, distance_measure):
     #Find max count 1 or 0
     #Return label
 
+    #This avoids collisions even though we didnt have to worry about it
     distanceLabelPairs = []
+    # Loops through both labels and samples of the labeled dataset
     for label, sample in zip(labeled_dataset.labels, labeled_dataset.samples):
+        #Calculates distance measure of already classified sample and new sample
         dist = distance_measure(sample, new_sample)
+        #Appends labeled pairs to distanceLabelPairs
         distanceLabelPairs.append((dist, label))
 
-
+    # This sorts the first value of the labeled pairs (keys)
     distanceLabelPairs.sort(key=lambda x: x[0])
 
-
+    # One line list for loop to loop through distance pairs and takes first k labels (k closest in sorted list)
     kLabels = [label for (_, label) in distanceLabelPairs[:k]]
 
-
+    #Turns list into numpy array with type int
     kLabelsArray = np.array(kLabels, dtype=int)
+    #Counts number of each value in the numpy array
     labelCounts = np.bincount(kLabelsArray)
+    #Predicted label is the max of the label count which is the most prevalent label
     predictedLabel = np.argmax(labelCounts)
 
     return predictedLabel

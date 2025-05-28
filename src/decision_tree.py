@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import os
 import random
 
-from assignment_1.src.dataset import generate_data, combine_data
+
 
 
 def find_features_for_continuous_data(data):
@@ -39,9 +39,11 @@ giytiuytuyttut
     for dim in range(num_features):
         value_label_map = {}
         for sample, label in zip(data.samples, data.labels):
+            #appends the dimension of the sample with the label value into the map
             value_label_map[sample[dim]] = label
-
+        # Sorts the keys by value
         sorted_items = sorted(value_label_map.items(), key=lambda x: x[0])
+
         thresholds = []
 
         # Compare adjacent items in sorted order
@@ -73,16 +75,18 @@ def featurize_continuous_data(data, features):
 
     samples = data.samples
     num_samples = data.num_samples
+    #Finds total binary features
     total_binary_features = sum(len(thresh_list) for thresh_list in features)
-
+    # Turns 0s to False and 1s to True
     bin_features = np.zeros((num_samples, total_binary_features), dtype=bool)
 
     feature_index = 0
+    # Avoids nested loops this is shorthand
     for dim, threshold_list in enumerate(features):
         for threshold in threshold_list:
             bin_features[:, feature_index] = samples[:, dim] < threshold
             feature_index += 1
-
+    # Returns dataset with samples of the features and the data labels
     return Dataset(bin_features.astype(int), data.labels)
 
 def entropy(dataset):
@@ -99,7 +103,7 @@ def entropy(dataset):
 
     if totalSamples == 0:
         return 0
-
+    # Returns the unique labels no dupes
     unique_labels, label_counts = np.unique(labels, return_counts=True)
 
     entropyV = -np.sum((label_counts / totalSamples) * np.log2(label_counts / totalSamples))

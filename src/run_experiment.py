@@ -1,4 +1,4 @@
-from assignment_1.src.dataset import Dataset
+
 from decision_tree import *
 import nearest_neighbor as knn
 import numpy as np
